@@ -1,0 +1,15 @@
+{
+    "EurekaURL": "http://admin:admin@127.0.0.1:8761/eureka",
+    "Services": [
+        {
+            "Appname": "dataService",
+            "Host": "localhost",
+            "Port": "8089"  
+        },
+        {
+            "Appname": "settings",
+            "Host": "test.example.de",
+            "Port": "8088"  
+        }
+    ]
+}

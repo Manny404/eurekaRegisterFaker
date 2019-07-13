@@ -19,7 +19,7 @@ Build your executable with go build and add all your service values to the confi
 all your servies should now be visible in Eureka.
 
 In case you use the Jhipster registry, you can query all services with this call.
-´´´
+```
 http://admin:admin@localhost:8761/eureka/apps/
 
-´´´
+```

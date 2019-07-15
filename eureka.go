@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"sync"
 	"syscall"
 	"time"
 
@@ -20,7 +21,8 @@ func (a *App) RegisterEureka() {
 	}
 
 	var closeAll []chan int
-	var closed []chan int
+
+	var waitgroup sync.WaitGroup
 
 	// Register deregister Call
 	sigs := make(chan os.Signal, 1)
@@ -38,18 +40,17 @@ func (a *App) RegisterEureka() {
 
 		closeChannel := make(chan int)
 		closeAll = append(closeAll, closeChannel)
-		closedChannel := make(chan int)
-		closed = append(closed, closedChannel)
-		go a.registerOneService(service, closeChannel, closedChannel)
+		waitgroup.Add(1)
+		go a.registerOneService(service, closeChannel, &waitgroup)
 	}
 
-	for _, closedChannel := range closed {
-		<-closedChannel
-	}
+	waitgroup.Wait()
 	fmt.Println("All Closed")
 }
 
-func (a *App) registerOneService(service Service, close chan int, closed chan int) {
+func (a *App) registerOneService(service Service, close chan int, waitgroup *sync.WaitGroup) {
+
+	defer waitgroup.Done()
 
 	client := eureka.NewClient([]string{
 		a.Conf.EurekaURL, //From a spring boot based eureka server
@@ -100,11 +101,11 @@ Loop:
 
 			err := client.SendHeartbeat(instance.App, instance.InstanceID)
 			if err != nil {
-				go a.registerOneService(service, close, closed)
+				waitgroup.Add(1)
+				go a.registerOneService(service, close, waitgroup)
 				break Loop
 			}
 		}
 
 	}
-	closed <- 1
 }

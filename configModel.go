@@ -6,6 +6,7 @@ type Configuration struct {
 }
 
 type Service struct {
+	Active  bool
 	Appname string
 	Host    string
 	Port    string

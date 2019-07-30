@@ -38,6 +38,10 @@ func (a *App) RegisterEureka() {
 
 	for _, service := range a.Conf.Services {
 
+		if !service.Active {
+			continue
+		}
+
 		closeChannel := make(chan int)
 		closeAll = append(closeAll, closeChannel)
 		waitgroup.Add(1)
@@ -97,7 +101,7 @@ Loop:
 			fmt.Println("Deregister Service " + instance.InstanceID)
 			client.UnregisterInstance(instance.App, instance.InstanceID)
 			break Loop
-		case <-time.After(10 * time.Second):
+		case <-time.After(30 * time.Second):
 
 			err := client.SendHeartbeat(instance.App, instance.InstanceID)
 			if err != nil {

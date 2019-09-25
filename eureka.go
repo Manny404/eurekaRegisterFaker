@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"os/signal"
 	"strconv"
@@ -83,7 +84,7 @@ func (a *App) registerOneService(service Service, close chan int, waitgroup *syn
 	instance.Metadata.Map["zone"] = "primary"
 	instance.Metadata.Map["version"] = "v1"
 
-	instance.InstanceID = service.Appname + ":" + instance.HostName + "" + strconv.FormatInt(time.Now().Unix(), 10)
+	instance.InstanceID = service.Appname + ":" + instance.HostName + "" + strconv.FormatInt(rand.Int63(), 10)
 
 	client.RegisterInstance(service.Appname, instance) // Register new instance in your eureka(s)
 	//applications, _ := client.GetApplications()           // Retrieves all applications from eureka server(s)
